@@ -6,13 +6,12 @@ import gcloud
 import sys
 import pinecone
 
+import psycopg2
+print(psycopg2.__version__)
+
 # Import model for embedding 
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('all-MiniLM-L6-v2')
-
-# Connect to Pinecone
-#pinecone.init(api_key='YOUR_API_KEY')
-#index = pinecone.Index('chatbot_data')
 
 api_endpoint = "us-central1-aiplatform.googleapis.com"
 project_id = "modular-bot-392623"  
@@ -63,7 +62,6 @@ def chat():
     access_token = subprocess.check_output(['gcloud', 'auth', 'print-access-token']).decode().strip()
 
     url = f"https://{api_endpoint}/v1/projects/{project_id}/locations/us-central1/publishers/google/models/chat-bison:predict"
-#    print(url)
     
     headers = {
        "Authorization": f"Bearer {access_token}",  
@@ -71,7 +69,6 @@ def chat():
     }
     
     response = requests.post(url, json=request_json, headers=headers)
-#    print(response.json())
     if response.status_code == 400:
         print(response.text) # print error response
     
@@ -79,12 +76,16 @@ def chat():
       print(f"Error: {response.status_code}")
       continue
 
-#    print(f"Bot: {response.json()['predictions'][0]['content']}")
-
     reply = response.json().get('predictions',[{}])[0].get('candidates',[{}])[0].get('content')
-#   store reply as a vector
 
     sayItPrintIt(reply)
+
+#   store reply as a vector
+
+#   Generate 512-d vectors 
+#user_vec = model.encode(user_input)
+#reply_vec = model.encode(reply)
+
 
 def outer():
     chat()
