@@ -6,6 +6,10 @@ import gcloud
 import sys
 import pinecone
 
+# Import model for embedding 
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
 # Connect to Pinecone
 #pinecone.init(api_key='YOUR_API_KEY')
 #index = pinecone.Index('chatbot_data')
