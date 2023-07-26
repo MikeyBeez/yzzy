@@ -4,10 +4,15 @@ import json
 import os
 import gcloud
 import sys
-import pinecone
+import datetime
+import pgvector
 
 import psycopg2
 print(psycopg2.__version__)
+
+conn = psycopg2.connect("dbname=postgres user=postgres")
+cur = conn.cursor()
+
 
 # Import model for embedding 
 from sentence_transformers import SentenceTransformer
