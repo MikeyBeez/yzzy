@@ -10,7 +10,7 @@ import pgvector
 import psycopg2
 print(psycopg2.__version__)
 
-conn = psycopg2.connect("dbname=postgres user=postgres")
+conn = psycopg2.connect("dbname=bard user=postgres")
 cur = conn.cursor()
 
 
@@ -35,7 +35,7 @@ def sayItPrintIt(reply):
 #   os.system("sleep 1")
 
     print(reply)
-#   subprocess.call(['say', reply])
+    subprocess.call(['say', reply])
 
 #   Unmute microphone 
 #   os.system('osascript -e "set volume input muted false"')
