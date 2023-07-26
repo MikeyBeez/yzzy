@@ -17,3 +17,9 @@ add the project
 
 
 etc. . . . 
+
+
+
+notes:  The say command and any voice synthesizer breaks with miniconda.  Use Anaconda.
+
+
