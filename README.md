@@ -5,6 +5,8 @@ On Google
 You need a Google Cloud account.  Set one up.  
 Create a project.  
 Enable the vertexai API within your new project.  
+I'm not using the vertex API here.  That API is expensive.
+I think the way I'm doing it is free.  
 Create an access token.  
 
 On you local machine
