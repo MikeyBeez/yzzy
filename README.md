@@ -1,4 +1,6 @@
 # yzzy
+yzzy.py.old works.  I'm currently refactoring the code, and that refactoring doesn't work yet.
+
 Agent for bard AI
 
 On Google 
