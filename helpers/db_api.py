@@ -1,10 +1,5 @@
 import psycopg2
-from dbconf import MY_DB_CONFIG
-
-print("test")
-print(MY_DB_CONFIG)
-
-# Use MY_DB_CONFIG to connect
+from dbconf import connection_string
 
 class DBConnection:
 
@@ -12,8 +7,17 @@ class DBConnection:
     self.connection = None
 
   def connect(self):
-    self.connection = psycopg2.connect(MY_DB_CONFIG)
+    self.connection = psycopg2.connect(connection_string)
     return self.connection
+
+  @con
+  @contextmanager
+  def __enter__(self):
+    self.connection = self.connect()
+    try:
+      yield self
+    finally:
+      self.close()
 
   def query(self, sql, params=None):
     with self.connection.cursor() as cursor:
@@ -34,12 +38,10 @@ class DBConnection:
 
 # Example usage
 
-db = DBConnection()
-db.connect()
+with DBConnection() as db:
 
-sql = "SELECT * FROM users WHERE id = %s"
-result = db.query(sql, [123])
+  sql = "SELECT * FROM users WHERE id = %s"
+  result = db.query(sql, [123])
 
-db.insert("logs", ["msg", "level"], ["App started", "INFO"]) 
+  db.insert("logs", ["msg", "level"], ["App started", "INFO"]) 
 
-db.close()

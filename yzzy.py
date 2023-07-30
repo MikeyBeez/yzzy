@@ -1,12 +1,12 @@
 # main.py
 
-
-from modules.ap import call_api
-from modules.db import db 
+from contextlib import contextmanager
+from api import call_api
+import db_api 
 
 def main():
 
-  db = db.DBConnection()
+  db = db_api.DBConnection()
   conn = db.connect()
 
   with db:
