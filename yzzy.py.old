@@ -1,0 +1,106 @@
+# Import all the python modules used in this program
+import subprocess
+import requests
+import json
+import os
+import gcloud
+import sys
+import datetime
+import psycopg2
+
+# Initialize global variables
+api_endpoint = "us-central1-aiplatform.googleapis.com"
+project_id = "modular-bot-392623"
+model_id = "projects/modular-bot-392623/models/codechat-bison/versions/001"
+hostName = "localhost"
+databaseName = "bard" 
+userName = "postgres"
+myPassword = ""
+conn = None
+user_id = "Mikey"
+
+def connectDB():
+
+    global conn
+    try:
+        conn = psycopg2.connect(
+            host = hostName,
+            database = databaseName,
+            user = userName,
+            password = myPassword)
+
+        cur = conn.cursor()
+        print("Connected successfully!")
+
+    except psycopg2.OperationalError as e:
+        print("Connection error: {}".format(e))
+
+
+def sayIt(reply):
+    print(reply)
+    subprocess.call(['say', reply])
+
+def storeIt(call, response, user_id):
+   global conn
+   print(call, response)
+   sql = "INSERT INTO conversations (call, response, user_id) VALUES (%s, %s, %s)"
+   cursor = conn.cursor()
+   cursor.execute(sql, (call, response, user_id))
+
+# Commit the insert 
+   conn.commit()
+
+# Close the connection
+   conn.close()
+
+def chat():
+  while True:
+    user_input = input("You: ")
+    if user_input == "exit":
+        sys.exit()
+
+    request_json = {
+        "instances": [
+            {
+                "messages": [
+                    {
+                        "content": user_input,
+                        "author": "user",
+                    }
+                ]
+            }
+        ]
+    }
+
+    access_token = subprocess.check_output(
+        ['gcloud', 'auth', 'print-access-token']).decode().strip()
+
+    url = f"https://{api_endpoint}/v1/projects/{project_id}/locations/us-central1/publishers/google/models/chat-bison:predict"
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    response = requests.post(url, json=request_json, headers=headers)
+    if response.status_code == 400:
+        print(response.text)  # print error response
+
+    if response.status_code != 200:
+      print(f"Error: {response.status_code}")
+      continue
+
+    reply = response.json().get('predictions', [{}])[0].get(
+        'candidates', [{}])[0].get('content')
+
+    sayIt(reply) 
+    storeIt(user_input, reply, user_id)
+
+
+def outer():
+    connectDB() # connect
+    chat()
+
+
+if __name__ == "__main__":
+    outer()
